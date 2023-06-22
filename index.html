@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+input[type="text"],
+button {
+  margin-bottom: 10px;
+}
+
+.card {
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 200px;
+  
+  border-radius: 50%;
+}
+
+.user-info {
+  margin-top: 10px;
+}
+
+.info {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.info li {
+  flex: 1;
+  text-align: center;
+  margin-bottom: 260px;
+}
+
+.info strong {
+  display: block;
+}
+
+
+#repos {
+  
+ display: flex;
+ flex-wrap: wrap;
+ 
+ justify-content: space-between;
+  position: relative;
+ bottom: 200px;
+
+}
+#repos a{
+  text-decoration: none;
+  padding-top:40px;
+  color: blue;
+}
+
+
+    </style>
+</head>
+<body>
+  <h1>Find github account </h1>
+    <input type="text" id="input" placeholder="search github user name" required>
+    <button id="btn">Click</button>
+    <div id="output"></div>
+    <script>
+       let input =document.getElementById('input')
+       let btn=document.getElementById('btn')
+       let output=document.getElementById('output')
+       let api="https://api.github.com/users/";
+       btn.addEventListener('click',getuser )
+       function getuser(){
+        if(input.value !== ""){
+            finduser(input.value)
+        }
+       }
+          function finduser(username){
+            fetch(`https://api.github.com/users/${username}`)
+            .then(function(res){
+                return res.json();
+            }).then(function(data){
+                console.log(data)
+                const card = `
+        <div class="card"> 
+          <div>
+            <img class="avatar" src="${data.avatar_url}" alt="Florin pop">
+          </div>
+          <div class="user-info">
+            <h4>${data.name}</h4>
+            <p>${data.bio}</p>
+            <ul class="info">
+              <li>${data.followers} <strong>Followers</strong></li>
+              <li>${data.following}<strong>Following</strong></li>
+              <li>${data.public_repos} <strong>Repos</strong></li>
+            </ul>
+            <div id="repos">
+            
+            </div>
+          </div>
+        </div>`;
+         output.innerHTML = card;
+         getrepos(username)
+      
+            }).catch(function(){
+                console.log(error)
+            })
+            
+        }
+       
+          function  getrepos(username){
+          const respo=document.getElementById('repos')
+
+          fetch(`https://api.github.com/users/${username}/repos`)
+          .then(function(res){
+            return res.json();
+
+          }).then(function(data){
+            for(let i=0;i<data.length && i<10;i++){
+              const item=data[i];
+              const ele=document.createElement('a');
+              ele.href=item.html_url;
+              ele.innerText=item.name;
+              respo.appendChild(ele)
+
+            }
+
+          }).catch(function(){
+            console.error(error)
+          })
+
+        }
+
+    </script>
+    
+</body>
+</html>
